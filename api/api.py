@@ -14,12 +14,17 @@ def api():
     # converting json dataset from dictionary to dataframe
     train = pd.DataFrame.from_dict(response_2, orient='columns')
     train.reset_index(level=0, inplace=True)
-    yellow=train.at[0,"layer_attribute_data"]
-    green=pd.DataFrame.from_dict(yellow, orient='index').transpose()
-    red=green.at[0,"attribute_data"]
-    df = pd.DataFrame(red)
-    df1=pd.DataFrame.from_records(df["properties"].values)
-    resp = make_response(df1.to_csv())
+    index = train.index
+    number_of_rows = len(index)
+    df_final=pd.DataFrame()
+    for i in range (number_of_rows):
+        yellow=train.at[i,"layer_attribute_data"]
+        green=pd.DataFrame.from_dict(yellow, orient='index').transpose()
+        red=green.at[0,"attribute_data"]
+        df = pd.DataFrame(red)
+        df1=pd.DataFrame.from_records(df["properties"].values)
+        df_final= pd.concat([df_final,df1])
+    resp = make_response(df_final.to_csv())
     resp.headers["Content-Disposition"] = "attachment; filename=export.csv"
     resp.headers["Content-Type"] = "text/csv"
     return resp
